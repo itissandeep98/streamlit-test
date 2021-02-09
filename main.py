@@ -29,6 +29,7 @@ def get_dataset(name):
     y = data.target
     return X, y
 
+
 def add_parameter_ui(clf_name):
     params = dict()
     if clf_name == 'SVM':
