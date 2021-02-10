@@ -1,22 +1,43 @@
 import streamlit as st 
 import numpy as np 
+import pandas as pd
+import matplotlib.pyplot  as plt
+from sklearn.linear_model import LinearRegression
 
-st.title("Registration form")
-
-first,last=st.beta_columns(2)
-first.text_input("First Name")
-last.text_input("Last Name")
-
-email,mob=st.beta_columns([3,1])
-email.text_input("email")
-mob.text_input("mob")
+data=pd.read_csv("data.csv")
+x=np.array(data['YearsExperience']).reshape(-1,1)
+y=np.array(data['Salary'])
+lr=LinearRegression()
+lr.fit(x,y)
 
 
-user,pw,pw2=st.beta_columns(3)
-user.text_input("Username")
-pw.text_input("Password",type="password")
-pw2.text_input("Confirm password",type="password")
+st.title("Salary Predictor")
 
-ch,b1,sub=st.beta_columns(3)
-ch.checkbox("I Agree")
-sub.button("Submit")
+nav=st.sidebar.radio("Navigation",['Home',"Prediction","Contribute"])
+
+if nav=="Home":
+    if st.checkbox("Show Table"):
+        st.table(data)
+
+    val=st.slider("Filter data using years",0,20)
+    data=data.loc[data['YearsExperience']>=val]
+    plt.figure(figsize=(10,5))
+    plt.scatter(data['YearsExperience'],data["Salary"])
+    plt.ylim(0)
+    plt.xlabel("Years of experience")
+    plt.ylabel("Salary")
+    plt.tight_layout()
+    st.pyplot(plt)
+
+
+elif nav=="Prediction":
+    st.header("Know your salary")
+    val=st.number_input("Enter Your Exp",0.00,20.00,step=0.25)
+    val=np.array(val).reshape(1,-1)
+    pred=lr.predict(val)[0]
+    if st.button("Predict"):
+        st.success(f"Your Predicted Salary is {round(pred)}")
+
+else:
+    st.write("Contribute")
+
